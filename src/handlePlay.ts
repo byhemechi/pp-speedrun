@@ -1,4 +1,5 @@
 import sql from "./db/sql";
+import { getState, saveState } from "./gameState";
 import { getPointOnCurve, getPPFromStars } from "./stars";
 import { PlayRow } from "./types/db";
 import type Play from "./types/play";
@@ -15,6 +16,15 @@ export default async function handlePlay(play: Play) {
     existing[0].score > play.trackers.scoreTracker.score
   )
     return;
+
+  const state = await getState();
+
+  if (state) {
+    await saveState({
+      ...state,
+      timeSpent: state.timeSpent + play.songDuration * 1000,
+    });
+  }
 
   const mapInfoResponse = await fetch(
     `https://scoresaber.com/api/leaderboard/by-hash/${play.songID}/info?difficulty=${play.songDifficultyRank}`

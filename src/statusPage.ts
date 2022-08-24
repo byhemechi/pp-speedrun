@@ -1,5 +1,6 @@
 import { getState, saveState } from "./gameState";
 import getPlays from "./getPlays";
+import { updateState } from "./socket";
 
 export default async function showCurrentStatus() {
   const state = await getState();
@@ -27,7 +28,9 @@ export default async function showCurrentStatus() {
   saveState({
     pp: totalPP,
     plays: rankedPlays,
-    timeSpent: state?.timeStarted ?? 0,
-    timeStarted: state?.timeSpent ?? Date.now(),
+    timeSpent: state?.timeSpent ?? 0,
+    timeStarted: state?.timeStarted ?? Date.now(),
   });
+
+  updateState();
 }

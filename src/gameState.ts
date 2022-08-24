@@ -14,8 +14,6 @@ export async function saveState(state: GameState) {
   await sql`REPLACE into kv(key, value) values ('gameState', ${JSON.stringify(
     state
   )})`;
-
-  updateState();
 }
 
 export async function getState() {

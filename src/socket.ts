@@ -8,7 +8,6 @@ export async function startWebSocket() {
 
   server.on("connection", (socket) => {
     const id = Symbol("Websocket Client");
-    console.log(id);
     clients.set(id, socket);
     updateState();
 
