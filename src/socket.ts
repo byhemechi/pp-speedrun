@@ -27,7 +27,6 @@ export async function startWebSocket() {
 export async function updateState() {
   const state = await getState();
   for (const [id, socket] of clients) {
-    console.log(id);
     socket.send(
       JSON.stringify({
         data: "state",
