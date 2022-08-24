@@ -8,6 +8,13 @@ export default async function initialise() {
       info TEXT,
       score real,
       timeSet TIMESTAMP default CURRENT_TIMESTAmP
-    )
+    );
+
+    
   `;
+
+  await sql`CREATE TABLE IF NOT EXISTS kv (
+    key TEXT PRIMARY KEY,
+    value TEXT
+  )`;
 }

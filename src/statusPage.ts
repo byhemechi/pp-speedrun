@@ -1,31 +1,11 @@
-import sql from "./db/sql";
-import { getPointOnCurve, getPPFromStars } from "./stars";
-import { RawPlayRow } from "./types/db";
-import { components as ScoreSaber } from "./types/scoresaber";
+import { getState, saveState } from "./gameState";
+import getPlays from "./getPlays";
 
 export default async function showCurrentStatus() {
-  const rawPlays = await sql<RawPlayRow>`select * from plays`;
-  console.clear();
-  if (!rawPlays) return;
+  const state = await getState();
+  const rankedPlays = await getPlays();
 
-  const parsedPlays = rawPlays.map((play) => {
-    const info = JSON.parse(
-      play.info
-    ) as ScoreSaber["schemas"]["LeaderboardInfo"];
-    const pp =
-      getPointOnCurve(play.score / info.maxScore) * getPPFromStars(info.stars);
-
-    return {
-      ...play,
-      info,
-      timeSet: new Date(play.timeSet),
-      pp,
-    };
-  });
-
-  const rankedPlays = parsedPlays
-    .sort((a, b) => b.pp - a.pp)
-    .map((i, n) => ({ ...i, ppWeighted: i.pp * Math.pow(0.965, n) }));
+  if (!rankedPlays) return;
 
   const totalPP = rankedPlays.reduce((previous, current) => {
     return previous + current.ppWeighted;
@@ -43,4 +23,11 @@ export default async function showCurrentStatus() {
       }))
       .splice(0, 50)
   );
+
+  saveState({
+    pp: totalPP,
+    plays: rankedPlays,
+    timeSpent: state?.timeStarted ?? 0,
+    timeStarted: state?.timeSpent ?? Date.now(),
+  });
 }

@@ -3,6 +3,7 @@ import db from "./db";
 import initialise from "./db/init";
 import sql, { exec } from "./db/sql";
 import handlePlay from "./handlePlay";
+import { startWebSocket } from "./socket";
 import { getPointOnCurve, getPPFromStars } from "./stars";
 import showCurrentStatus from "./statusPage";
 import { watchForPlays } from "./watchForPlays";
@@ -18,7 +19,9 @@ async function main() {
   );
 
   await initialise();
-  showCurrentStatus();
+  await showCurrentStatus();
+
+  startWebSocket();
 
   for await (const play of playGenerator) {
     await handlePlay(play);
